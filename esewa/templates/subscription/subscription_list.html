@@ -1,0 +1,117 @@
+
+{% comment %} <table rules=all>
+  <thead><tr><th>name</th><th>description</th><th>price</th><th>renewal</th><th>Pay it</th></tr></thead>
+  <tbody>
+{% for a in object_list %}
+<tr>
+<td>{{a.name}}</td>
+<td>{{a.description}}</td>
+{% comment %} <td>{{a.price}}</td> {% endcomment %}
+{% comment %} <td>{{a.get_pricing_display}}</td>
+<td>{{a.renewal_period}}</td>
+<td><a href="{% url 'subscription_detail' a.id  %}">Pay &raquo;</a></td>
+
+{% endfor %}
+</tbody>
+</table>  {% endcomment %} 
+
+{% comment %} <table rules=all>
+  <thead><tr><th>name</th><th>description</th><th>price</th><th>renewal</th><th>signup</th></tr></thead>
+  <tbody>
+    {% for o in object_list %}
+   <tr>
+      <th>{{o.name}}</th>
+      <td>{{o.description}}</td>
+      <td>{{o.get_pricing_display}}</td>
+      <td>{{o.renewal_period}}</td>
+      <td><a href="{% url subscription_detail o.id 'standard' %}">standard &raquo;</a> | <a href="{% url subscription_detail o.id 'pro' %}">pro &raquo;</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table> {% endcomment %}
+ 
+
+ {% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>List page</title>
+  </head>
+  <body>
+  <br>
+  <br>
+    
+    <br/>
+
+{% comment %} {% for p in pro %}
+
+<div class="card" style="width: 18rem;">
+  <img src="{{p.image.url}}" class="card-img-top" alt="product_img">
+  <div class="card-body">
+    <h5 class="card-title">{{p.title}}</h5>
+    <p class="card-text">{{p.description}} </p>
+    <p class="card-text">${{p.price}} </p>
+    <a href="{% url 'esewa' p.id %}" class="btn btn-primary">subscribe with esewa</a>
+  </div>
+</div>
+ 
+   
+
+    {% endfor %} {% endcomment %}
+
+
+  
+{% comment %} here we use forloop for the iteration  {% endcomment %}
+<div class="container">
+<div class="row">
+{% for a in object_list %}
+ 
+ 
+
+ 
+{% comment %} <h1 style="text-align:center">Subscribe</h1> {% endcomment %}
+    
+    <br/>
+ 
+ 
+<div class="card col-4" style="width: 18rem;">
+  {% comment %} <img src="{{p.image.url}}" class="card-img-top" alt="product_img"> {% endcomment %}
+  <div class="card-body">
+    <h5 class="card-title">{{a.name}}</h5>
+    <p class="card-text">{{a.description}} </p>
+    <p class="card-text">Nrs {{a.get_pricing_display}} </p>
+    <a href="{% url 'subscription_detail' a.id  %}" class="btn btn-primary">Pay &raquo;</a>
+ 
+  </div>
+</div>
+ 
+ {% endfor %}
+</div>
+</div>
+ 
+   
+
+   
+
+
+
+ 
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    -->
+  </body>
+</html>
