@@ -157,8 +157,13 @@ class subscription_detail(View):
 
 
 def dashboard(request):
-    sub = Subscription.objects.filter(payment_completed=True)  
-    return render(request,"subscription/dashboard.html",{'sub':sub})
+    sub = Subscription.objects.filter(payment_completed=True) 
+    for i in sub:
+        if i.name=="Basic":
+            return render(request,"subscription/dashboard.html",{"sub":sub})
+        else:
+
+            return render(request,"subscription/dashboard1.html",{'sub':sub})
 
 
     
