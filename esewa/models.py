@@ -21,7 +21,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to="products")
     description = models.TextField(max_length=300)
     price = models.IntegerField()
-    payment_completed = models.BooleanField(default=False, null=True, blank=True)
+    payment_complete = models.BooleanField(default=False, null=True, blank=True)
 
 # this is for the display the title in the admin panel
     def __str__(self):
@@ -31,11 +31,7 @@ class Product(models.Model):
 
 
 class eSewa(models.Model):
-	order = models.ForeignKey(Product,on_delete=models.CASCADE)
-	refId = models.CharField(max_length=255)
-	amount = models.DecimalField(max_digits=64, decimal_places=2, default=0, blank=True, null=True)
-	date = models.DateTimeField(blank=True, null=True, help_text="HH:MM:SS DD Mmm YY, YYYY PST")
-    
+	 merchant_id = models.CharField(max_length=100,default='epay_payment')
     
 
 
@@ -384,3 +380,21 @@ def handle_subscription_signup(sender, **kwargs):
         signals.event.send(s, ipn=sender, subscription=s, user=u,
                            event='unexpected_subscription')
  
+
+
+class Github(models.Model):
+    SOCIAL_AUTH_GITHUB_KEY = models.CharField(max_length=100)
+    SOCIAL_AUTH_GITHUB_SECRET = models.CharField(max_length=100)
+
+
+class Twitter(models.Model):
+    SOCIAL_AUTH_TWITTER_KEY = models.CharField(max_length=100)
+    SOCIAL_AUTH_TWITTER_SECRET = models.CharField(max_length=100)
+
+class Facebook(models.Model):
+    SOCIAL_AUTH_FACEBOOK_KEY = models.CharField(max_length=100)
+    SOCIAL_AUTH_FACEBOOK_SECRET = models.CharField(max_length=100)
+
+class Google(models.Model):
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = models.CharField(max_length=100)
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = models.CharField(max_length=100)

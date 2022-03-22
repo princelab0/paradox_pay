@@ -1,12 +1,12 @@
 from django.urls import path
-from .views import dashboard, homePage,EsewaRequestView,EsewaVerifyView,detail,subscription_list,subscription_detail
+from .views import dashboard, HomePage,EsewaRequestView,EsewaVerifyView,detail,subscription_list,subscription_detail
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
 
 urlpatterns = [
     # path('',homepage),
-    path('',homePage.as_view(),name="home"),
+    path('',HomePage.as_view(),name="home"),
     # path('<int:id>/esewa/',esewa,name="esewa"),
     # path('<int:pk>/esewa/',Esewa.as_view(),name="esewa"),
     #this is the url for request esewa payment

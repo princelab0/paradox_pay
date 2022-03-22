@@ -12,6 +12,7 @@
     <title>List page</title>
   </head>
   <body>
+  <p>Hello {{ user.username }}!</p>
     <h1 style="text-align:center">our Products</h1>
     <hr>
     <br/>
@@ -45,7 +46,7 @@
     <h5 class="card-title">{{p.title}}</h5>
     <p class="card-text">{{p.description}} </p>
     <p class="card-text">Nrs {{p.price}} </p>
-    <a href="{% url 'esewarequest' p.id %}" class="btn btn-primary">subscribe with esewa</a>
+    <a href="{% url 'esewarequest' p.id %}" class="btn btn-primary">pay with esewa</a>
   </div>
 </div>
  {% endfor %}
