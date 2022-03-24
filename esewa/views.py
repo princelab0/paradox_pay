@@ -41,7 +41,9 @@ class HomePage(ListView):
 
 
 #EsewaRequstView where we request for the payment of product to the esewa payment gateway
-@method_decorator(login_required,name='dispatch')
+# @method_decorator(login_required,name='dispatch')
+
+
 class EsewaRequestView(View):
     def get(self,request,*args,**kwargs):
         # o_id = request.GET.get(kwargs['pk'])
@@ -74,7 +76,7 @@ class EsewaVerifyView(View):
 
         d = {                                               
             'amt': amt,
-            'scd': eSewa.objects.get(id=1) ,
+            'scd': eSewa.objects.get(id=1) ,   
             'rid': refId,
             'pid': oid,
 
@@ -92,27 +94,28 @@ class EsewaVerifyView(View):
         print(status)      
         order_id = oid                                 
         # order_obj = Product.objects.get(id=id)
-        # order_prod = Product.objects.get(id=order_id)
-        # if order_prod:
-        #     if status == "Success":
-        #         print(status)
-        #         order_prod.payement_complete = True
-        #         order_prod.save()
-        #         return redirect("/")
-        #     else:
-        #         print("failed")
-        #         return redirect("/esewa-request/?o_id="+order_id)
-
-        order_obj = Subscription.objects.get(id = order_id)
-        #here we check whether success or not
-        if order_obj:
+        try:
+            order_prod = Product.objects.get(id = order_id)
+            print(order_prod)
+            if status == "Success":
+                print(status)
+                order_prod.payment_completed = True
+                order_prod.save()
+                return redirect("/")
+            else:
+                print("failed")
+                return redirect("/esewa-request/?o_id="+order_id)
+        except:
+            order_obj = Subscription.objects.get(id = order_id)
+            #here we check whether success or not
+           
             if status == "Success":  
                 print(status)     
                 order_obj.payment_completed = True
                 order_obj.save()                     
                 return redirect("/dashboard")
             else:                                               
-                    #return redirect("/esewa/?p_id="+order_obj)
+                        #return redirect("/esewa/?p_id="+order_obj)
                 return redirect("/esewa-request/?o_id="+order_id)
 
 
@@ -126,7 +129,7 @@ def detail(request):
  
 
 # this is the subscription list view where we will list all the objects or subscription plan
-@method_decorator(login_required,name='dispatch')
+# @method_decorator(login_required,name='dispatch')
 def subscription_list(request):
     # here first of all we will list all the objects
     object_list=Subscription.objects.all() 
@@ -138,6 +141,7 @@ def subscription_list(request):
         if i.payment_completed == True:
             # if already paid we will redirect to dashboard
             return redirect("/dashboard")
+
         # if payment is not completed we will show the subscription plan to the user
         else:
             return render(request, 'subscription/subscription_list.html',{"object_list":object_list})
@@ -156,7 +160,7 @@ def subscription_list(request):
 
 
 # this is the subscription detail plan where we will redirect the subscription plan for the payment purpose
-@method_decorator(login_required,name='dispatch')
+# @method_decorator(login_required,name='dispatch')
 class subscription_detail(View):
     def get(self,request,*args,**kwargs):
         # o_id = request.GET.get(kwargs['pk'])
@@ -175,7 +179,7 @@ class subscription_detail(View):
 
  
 
-@method_decorator(login_required,name='dispatch')
+# @method_decorator(login_required,name='dispatch')
 def dashboard(request):
     sub = Subscription.objects.filter(payment_completed=True) 
     for i in sub:

@@ -164,16 +164,17 @@ LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = '/'
 
-SOCIAL_AUTH_GITHUB_KEY = 'your key'
-SOCIAL_AUTH_GITHUB_SECRET = 'your secret key'
+# SOCIAL_AUTH_GITHUB_KEY = 'your key'
+# SOCIAL_AUTH_GITHUB_SECRET = 'your secret key'
 
-SOCIAL_AUTH_TWITTER_KEY = 'your key'
-SOCIAL_AUTH_TWITTER_SECRET = 'your secret key'
+# SOCIAL_AUTH_TWITTER_KEY = 'your key'
+# SOCIAL_AUTH_TWITTER_SECRET = 'your secret key'
 
-SOCIAL_AUTH_FACEBOOK_KEY = 'your key' # Facebook App ID
-SOCIAL_AUTH_FACEBOOK_SECRET = 'your secret key'  # Facebook App Secret
-SOCIAL_AUTH_FACEBOOK_SCOPE = ['']
+# SOCIAL_AUTH_FACEBOOK_KEY = 'your key' # Facebook App ID
+# SOCIAL_AUTH_FACEBOOK_SECRET = 'your secret key'  # Facebook App Secret
+# SOCIAL_AUTH_FACEBOOK_SCOPE = ['']
 
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'your key'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'your secret key'  # Google Consumer Secret
+# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'your key'
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'your secret key'  # Google Consumer Secret
+

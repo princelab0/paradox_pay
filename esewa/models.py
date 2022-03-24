@@ -21,7 +21,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to="products")
     description = models.TextField(max_length=300)
     price = models.IntegerField()
-    payment_complete = models.BooleanField(default=False, null=True, blank=True)
+    payment_completed = models.BooleanField(default=False, null=True, blank=True)
 
 # this is for the display the title in the admin panel
     def __str__(self):
