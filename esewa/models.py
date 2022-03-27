@@ -18,8 +18,8 @@ from django.utils.translation import gettext_lazy as ugettext_lazy
 # Product model
 class Product(models.Model):
     title = models.CharField(max_length=100)
-    image = models.ImageField(upload_to="products")
-    description = models.TextField(max_length=300)
+    image = models.ImageField(upload_to="products",null=True,blank=True)
+    description = models.TextField(max_length=300,null=True,blank=True)
     price = models.IntegerField()
     payment_completed = models.BooleanField(default=False, null=True, blank=True)
 
