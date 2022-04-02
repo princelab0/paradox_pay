@@ -1,9 +1,10 @@
 from unicodedata import name
 from django.test import TestCase
+from django.urls import reverse
 
 # Create your tests here.
 from django.contrib.auth.models import Group
-from .models import Product,Subscription
+from .models import Product,Subscription,Transaction,UserSubscription
 
 class ProductModelTest(TestCase):
     def setUp(self):
@@ -71,9 +72,45 @@ class SubscriptionModelTest(TestCase):
     #     subscription = Subscription.objects.get(id=1)
     #     expected_object_name = f'{subscription.recurrence_end_date}'
     #     self.assertEqual(expected_object_name, '2022-04-01')\
-
-
     def test_group_content(self):
         subscription = Subscription.objects.get(id=1)
         expected_object_name = f'{subscription.group}'
         self.assertEqual(expected_object_name, 'test')
+
+
+
+class TransactionModelTest(TestCase):
+    def setUp(self):
+        Transaction.objects.create(comment="test")
+
+    def test_comment_content(self):
+        transaction = Transaction.objects.get(id=1)
+        expected_object_name = f'{transaction.comment}'
+        self.assertEqual(expected_object_name,'test')
+
+# class UserSubscriptionModelTest(TestCase):
+#     def setUp(self):
+#         UserSubscription.objects.create(expires='2022-10-28')
+
+#     def test_expires_content(self):
+#         usersub= UserSubscription.objects.get(id=1)
+#         expected_object_name = {usersub.expires}
+#         self.assertEqual(expected_object_name,'2022-10-28')
+        
+
+
+class HomePageViewTest(TestCase):
+    def setUp(self):
+        Product.objects.create(title='this is another test',price=20,image='media/products/abx.jpg')
+    def test_view_url_exists_at_proper_location(self):
+        resp = self.client.get('/')
+        self.assertEqual(resp.status_code, 200)
+
+    def test_view_url_by_name(self):
+        resp = self.client.get(reverse('home'))
+        self.assertEqual(resp.status_code, 200)
+    def test_view_uses_correct_template(self):
+        resp = self.client.get(reverse('home'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'home.html')
+

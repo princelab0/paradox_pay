@@ -73,6 +73,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',   
                 'social_django.context_processors.login_redirect',
+                 
             ],
         },
     },
@@ -163,18 +164,31 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'login'
 
-# SOCIAL_AUTH_GITHUB_KEY = 'your key'
-# SOCIAL_AUTH_GITHUB_SECRET = 'your secret key'
+SOCIAL_AUTH_GITHUB_KEY = 'your key'
+SOCIAL_AUTH_GITHUB_SECRET = 'your secret key'
 
-# SOCIAL_AUTH_TWITTER_KEY = 'your key'
-# SOCIAL_AUTH_TWITTER_SECRET = 'your secret key'
+SOCIAL_AUTH_TWITTER_KEY = 'your key'
+SOCIAL_AUTH_TWITTER_SECRET = 'your secret key'
 
-# SOCIAL_AUTH_FACEBOOK_KEY = 'your key' # Facebook App ID
-# SOCIAL_AUTH_FACEBOOK_SECRET = 'your secret key'  # Facebook App Secret
-# SOCIAL_AUTH_FACEBOOK_SCOPE = ['']
+SOCIAL_AUTH_FACEBOOK_KEY = 'your key' # Facebook App ID
+SOCIAL_AUTH_FACEBOOK_SECRET = 'your secret key'  # Facebook App Secret
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['']
 
 
-# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'your key'
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'your secret key'  # Google Consumer Secret
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'your key'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'your secret key'  # Google Consumer Secret
+
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'user_link']
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+  'fields': 'id, name, email, picture.type(large), link'
+}
+SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [
+    ('name', 'name'),
+    ('email', 'email'),
+    ('picture', 'picture'),
+    ('link', 'profile_url'),
+]
+ 
 

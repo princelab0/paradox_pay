@@ -33,7 +33,7 @@ from django.http import Http404
 
 
 #homgePage view where we list all of the product
-@method_decorator(login_required,name='dispatch')
+# @method_decorator(login_required,name='dispatch')
 class HomePage(ListView):
     template_name = "home.html"
     model = Product
