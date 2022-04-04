@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import dashboard, HomePage,EsewaRequestView,EsewaVerifyView,detail,subscription_list,subscription_detail
+from .views import dashboard, HomePage,EsewaRequestView,EsewaVerifyView,detail,subscription_list,subscription_detail,register
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
@@ -10,6 +10,7 @@ urlpatterns = [
     # path('<int:id>/esewa/',esewa,name="esewa"),
     # path('<int:pk>/esewa/',Esewa.as_view(),name="esewa"),
     #this is the url for request esewa payment
+    path('register/',register, name='register'),
     path("esewa-request/<int:pk>/", EsewaRequestView.as_view(), name="esewarequest"),
     #this is the url for verifying whether esewa payment is success or not
     path("esewa-verify/", EsewaVerifyView.as_view(), name="esewaverify"),
