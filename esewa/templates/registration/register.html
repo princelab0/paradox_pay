@@ -13,11 +13,13 @@
 			
 				<div class="col-md-6 col-lg-5">
 				<h2 class="heading-section">Please signup here</h2>
-					<div class="login-wrap p-0">
+					<div class="login-wrap p-0 mt-5">
 		      	{% comment %} <h3 class="mb-4 text-center">Have an account?</h3> {% endcomment %}
-		      	<form method="post" class="signin-form">
-               {{ user_form.as_p }}
-                {% csrf_token %}
+		      	<form method="post" class="signin-form">{% csrf_token %}
+				  <table>
+               {{ user_form }}
+			   </table>
+                
 	            <div class="form-group">
 	            	<button type="submit" class="form-control btn btn-primary submit px-3">Sign up</button>
 	            </div>
