@@ -151,7 +151,8 @@ div { column-gap: 40px; }
          {% comment %} <span>Groceries</span> {% endcomment %}
             <h5 class="mb-0">{{p.title}}</h5>
             <div class="price"> <span>Nrs {{p.price}}</span></sup> </div>
-             <a href="{% url 'esewarequest' p.id %}" class="btn success text-uppercase btn-sm details">pay with esewa</a>
+             {% comment %} <a href="{% url 'esewarequest' p.id %}" class="btn success text-uppercase btn-sm details">pay with esewa</a> {% endcomment %}
+             <a href="{% url 'addtocart' p.id %}" class="btn success text-uppercase btn-sm details"> Add to Cart </a>
         </div>
         </div>
         <br>

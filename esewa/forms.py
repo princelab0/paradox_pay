@@ -56,10 +56,17 @@ class UserRegistrationForm(forms.ModelForm):
     widget=forms.PasswordInput)
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'email')
+        fields = ('username', 'first_name', 'last_name','email')
     def clean_password2(self):
         cd = self.cleaned_data
         if cd['password'] != cd['password2']:
             raise forms.ValidationError('Passwords don\'t match.')
         return cd['password2']
+
+from .models import Order
+
+class CheckoutForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ["ordered_by","shipping_address","mobile", "email",'payment_method']
 

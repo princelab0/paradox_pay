@@ -13,8 +13,8 @@
 <body>
     <h3 style="text-align: center;">You will be redirected to the esewa website..</h3>
     <form action="https://uat.esewa.com.np/epay/main" method="POST" id="myform">
-        <input value="{{order.price}}" name="tAmt" type="hidden">
-        <input value="{{order.price}}" name="amt" type="hidden">
+        <input value="{{order.total}}" name="tAmt" type="hidden">
+        <input value="{{order.total}}" name="amt" type="hidden">
         <input value="0" name="txAmt" type="hidden">
         <input value="0" name="psc" type="hidden">
         <input value="0" name="pdc" type="hidden">

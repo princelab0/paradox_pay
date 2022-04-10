@@ -195,7 +195,8 @@ div { column-gap: 40px; }
         <div class="card-inner"> <span></span>
             <h5 class="mb-0">{{a.description}}</h5>
             <div class="price"> <span>Nrs {{a.get_pricing_display}}</span>  </div>
-             <a href="{% url 'subscription_detail' a.id  %}" class="btn  text-uppercase btn-sm details">pay with esewa</a>
+            {% comment %} <a href="{% url 'addtocart' p.id %}" class="btn success text-uppercase btn-sm details"> Add to Cart </a> {% endcomment %}
+            <a href="{% url 'subscription_detail' a.id  %}" class="btn  text-uppercase btn-sm details">pay with esewa</a>
              
         </div>
     </div>
