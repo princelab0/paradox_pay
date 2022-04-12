@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from .forms import CheckoutForm
 from django.urls import reverse_lazy
+from django.http import JsonResponse
 
 # from esewa.providers import PaymentMethodFactory
 from django.http import Http404
@@ -154,15 +155,31 @@ class EsewaVerifyView(View):
 
         status = root[0].text.strip()                       
 
-        order_id = oid                        
-        order_obj = Order.objects.get(id=order_id)
+        order_id = oid 
+        try:
 
-        if status == "Success":                             
-            order_obj.payment_completed = True
-            order_obj.save()
-            return redirect("/")
-        else:                                               
-            return redirect("/esewa-request/?o_id="+order_id)
+            order_obj = Order.objects.get(id=order_id)
+
+            if status == "Success":                             
+                order_obj.payment_completed = True
+                order_obj.save()
+                return redirect("/")
+            else:                                               
+                return redirect("/esewa-request/?o_id="+order_id)
+                
+        except:
+            order_obj = Subscription.objects.get(id = order_id)
+            #here we check whether success or not
+           
+            if status == "Success":  
+                print(status)     
+                order_obj.payment_completed = True
+                order_obj.save()                     
+                return redirect("/dashboard")
+            else:                                               
+                return redirect("/esewa-request/?o_id="+order_id)
+
+
 
 def detail(request):
     return render(request,'detail.html')
@@ -213,7 +230,7 @@ class subscription_detail(View):
         context = {
             "order":order
         }
-        return render(request,"esewarequest.html",context)
+        return render(request,"subscription/esewarequest.html",context)
 
 
 
@@ -370,9 +387,60 @@ class CheckoutView(CreateView):
             order = form.save()
             if pm == "Esewa":
                 return redirect(reverse("esewarequest")+ "?o_id=" + str(order.id))
+            elif pm == "Khalti":                              
+                return redirect(reverse("khaltirequest") + "?o_id=" + str(order.id))
         else:
             return redirect("home")
         return super().form_valid(form)
+
+
+
+class KhaltiRequestView(View):
+    def get(self, request, *args, **kwargs):
+        o_id = request.GET.get("o_id")
+        order = Order.objects.get(id=o_id)
+        context = {
+            "order": order
+        }
+        return render(request, "khaltirequest.html", context)
+
+
+class KhaltiVerifyView(View):
+    def get(self, request, *args, **kwargs):
+        token = request.GET.get("token")                    
+        amount = request.GET.get("amount")                  
+        o_id = request.GET.get("order_id")                  
+
+        url = "https://khalti.com/api/v2/payment/verify/"   
+
+        payload = {                                 
+            "token": token,
+            "amount": amount
+        }
+
+        headers = {                                
+            "Authorization": "Key <your_secret_key>"
+        }
+
+        order_obj = Order.objects.get(id=o_id)
+        print(order_obj)
+        response = requests.post(url, payload, headers=headers) 
+        print(response)        
+        resp_dict = response.json()               
+
+        if resp_dict.get("idx"):                 
+            success = True                        
+            order_obj.payment_completed = True    
+            order_obj.save()                      
+
+        else:                                     
+            success = False                         
+
+        data = {
+            "success": success
+        }
+
+        return JsonResponse(data)          
      
 
 

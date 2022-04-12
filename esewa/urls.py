@@ -15,6 +15,9 @@ urlpatterns = [
     path("esewa-request/", EsewaRequestView.as_view(), name="esewarequest"),
     #this is the url for verifying whether esewa payment is success or not
     path("esewa-verify/", EsewaVerifyView.as_view(), name="esewaverify"),
+    path("khalti-request/", KhaltiRequestView.as_view(), name="khaltirequest"),
+    #this is the url for verifying whether khalti payment is success or not
+    path("khalti-verify/", KhaltiVerifyView.as_view(), name="khaltiverify"),
 
     #detail page
     path('detail/',detail,name="detail"),

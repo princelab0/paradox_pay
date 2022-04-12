@@ -13,6 +13,8 @@ from django.utils.translation import gettext as _,ngettext
 # from django.utils.translation import ugettext as _, ungettext, ugettext_lazy
 from django.utils.translation import gettext_lazy as ugettext_lazy
 
+ 
+
 # Create your models here.
 
 
@@ -70,6 +72,7 @@ class Subscription(models.Model):
     recurrence_unit = models.CharField(max_length=1, null=True,
                                        choices=((None, ugettext_lazy("No recurrence")),)
                                        + _TIME_UNIT_CHOICES)
+    
     group = models.ForeignKey(auth.models.Group,on_delete=models.CASCADE, null=False, blank=False, unique=False)
 
     def __str__(self):
@@ -181,6 +184,9 @@ class Transaction(models.Model):
 
     class Meta:
         ordering = ('-timestamp',)
+
+    def __str__(self):
+        return self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
 
 class UserSubscription(models.Model):
@@ -294,16 +300,16 @@ class UserSubscription(models.Model):
         return rv
 
 
-def unsubscribe_expired():
-    """Unsubscribes all users whose subscription has expired.
-    Loops through all UserSubscription objects with `expires' field
-    earlier than datetime.date.today() and forces correct group
-    membership."""
-    for us in UserSubscription.objects.get(expires__lt=datetime.date.today()):
-        us.fix()
+    def unsubscribe_expired():
+        """Unsubscribes all users whose subscription has expired.
+        Loops through all UserSubscription objects with `expires' field
+        earlier than datetime.date.today() and forces correct group
+        membership."""
+        for us in UserSubscription.objects.get(expires__lt=datetime.date.today()):
+            us.fix()
 
 
-# ### Handle signals
+    # ### Handle signals
 def _ipn_usersubscription(payment):
     class PseudoUS(object):
         pk = None
@@ -330,18 +336,72 @@ def _ipn_usersubscription(payment):
             us = UserSubscription.objects.get(subscription=s, user=u)
         except UserSubscription.DoesNotExist:
             us = UserSubscription(user=u, subscription=s, active=False)
-            Transaction(user=u, subscription=s, ipn=payment,
-                        event='new usersubscription', amount=payment.mc_gross
-                        ).save()
+            Transaction(user=u, subscription=s, ipn=payment,event='new usersubscription', amount=payment.mc_gross).save()
     else:
         us = PseudoUS(user=u, subscription=s)
 
     return us
 
-    
 
-
+def handle_payment_was_successful(sender, **kwargs):
+    us = _ipn_usersubscription(sender)
+    u, s = us.user, us.subscription
+    if us:
+        if not s.recurrence_unit:
+            if sender.mc_gross == s.price:
+                us.subscribe()
+                us.expires = None
+                us.active = True
+                us.save()
+                Transaction(user=u, subscription=s, ipn=sender,
+                            event='one-time payment', amount=sender.mc_gross
+                            ).save()
+                signals.signed_up.send(s, ipn=sender, subscription=s, user=u,
+                                       usersubscription=us)
+            else:
+                Transaction(user=u, subscription=s, ipn=sender,
+                            event='incorrect payment', amount=sender.mc_gross
+                            ).save()
+                signals.event.send(s, ipn=sender, subscription=s, user=u,
+                                   usersubscription=us, event='incorrect payment')
+        else:
+            if sender.mc_gross == s.price:
+                us.extend()
+                us.save()
+                Transaction(user=u, subscription=s, ipn=sender,
+                            event='subscription payment', amount=sender.mc_gross
+                            ).save()
+                signals.paid.send(s, ipn=sender, subscription=s, user=u,
+                                  usersubscription=us)
+            else:
+                Transaction(user=u, subscription=s, ipn=sender,
+                            event='incorrect payment', amount=sender.mc_gross
+                            ).save()
+                signals.event.send(s, ipn=sender, subscription=s, user=u,
+                                   usersubscription=us, event='incorrect payment')
+    else:
+        Transaction(user=u, subscription=s, ipn=sender,
+                    event='unexpected payment', amount=sender.mc_gross
+                    ).save()
+        signals.event.send(s, ipn=sender, subscription=s, user=u, event='unexpected_payment')
+# EsewaVerifyView.signals.payment_was_successful.connect(handle_payment_was_successful)
  
+
+
+def handle_payment_was_flagged(sender, **kwargs):
+    us = _ipn_usersubscription(sender)
+    u, s = us.user, us.subscription
+    Transaction(user=u, subscription=s, ipn=sender,
+                event='payment flagged', amount=sender.mc_gross
+                ).save()
+    signals.event.send(s, ipn=sender, subscription=s, user=u, event='flagged')
+    
+# EsewaVerifyView.signals.payment_was_flagged.connect(handle_payment_was_flagged)
+
+        
+
+
+    
 def handle_subscription_signup(sender, **kwargs):
     us = _ipn_usersubscription(sender)
     u, s = us.user, us.subscription
@@ -352,34 +412,25 @@ def handle_subscription_signup(sender, **kwargs):
                 continue     # don't touch current subscription
             if old_us.cancelled:
                 old_us.delete()
-                Transaction(user=u, subscription=s, ipn=sender,
-                            event='remove subscription (deactivated)', amount=sender.mc_gross
-                            ).save()
+                Transaction(user=u, subscription=s, ipn=sender,event='remove subscription (deactivated)', amount=sender.mc_gross).save()
             else:
                 old_us.active = False
                 old_us.unsubscribe()
                 old_us.save()
-                Transaction(user=u, subscription=s, ipn=sender,
-                            event='deactivated', amount=sender.mc_gross
-                            ).save()
+                Transaction(user=u, subscription=s, ipn=sender,event='deactivated', amount=sender.mc_gross).save()
 
-        # activate new subscription
+            # activate new subscription
         us.subscribe()
         us.active = True
         us.cancelled = False
         us.save()
-        Transaction(user=u, subscription=s, ipn=sender,
-                    event='activated', amount=sender.mc_gross
-                    ).save()
+        Transaction(user=u, subscription=s, ipn=sender,event='activated', amount=sender.mc_gross).save()
 
         signals.subscribed.send(s, ipn=sender, subscription=s, user=u,
-                                usersubscription=us)
+                                    usersubscription=us)
     else:
-        Transaction(user=u, subscription=s, ipn=sender,
-                    event='unexpected subscription', amount=sender.mc_gross
-                    ).save()
-        signals.event.send(s, ipn=sender, subscription=s, user=u,
-                           event='unexpected_subscription')
+        Transaction(user=u, subscription=s, ipn=sender,event='unexpected subscription', amount=sender.mc_gross).save()
+        signals.event.send(s, ipn=sender, subscription=s, user=u,event='unexpected_subscription')
  
 
 
@@ -432,6 +483,7 @@ ORDER_STATUS = (
 METHOD = (
 ("Cash On Delivery","Cash On Delivery"),
 ("Esewa","Esewa"),
+("Khalti", "Khalti"),
 )
 
 class Order(models.Model):

@@ -1,0 +1,75 @@
+<html>
+<head>
+    <script src="https://unpkg.com/khalti-checkout-web@latest/dist/khalti-checkout.iffe.js"></script>
+</head>
+<body>
+    
+    <h3>Your order amount is Rs. {{order.total}}</h3>
+
+    <!-- Place this where you need payment button -->
+    <button id="payment-button">Pay with Khalti</button>
+    <!-- Place this where you need payment button -->
+    <!-- Paste this code anywhere in you body tag -->
+
+    <a href="/">Go to Home page</a>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>        {# axios use garna ko lagi cdn link use gareko #}
+
+    <script>
+        var config = {
+            // Keep your test_public_Key_
+            "publicKey": "your test_public_key",
+            "productIdentity": "order_{{order.id}}",
+            "productName": "order_{{order.id}}",
+            "productUrl": "http://localhost:8000",
+            "paymentPreference": [
+                "MOBILE_BANKING",
+                "KHALTI",
+                "EBANKING",
+                "CONNECT_IPS",
+                "SCT",
+                ],
+            "eventHandler": {
+                onSuccess (payload) {
+                    // hit merchant api for initiating verfication
+                    console.log(payload)                        // khalti le pathayeko payload
+                    
+                    axios.get("/khalti-verify/", {              // axios ko help batw ajax call gareko cha// hamro KhaltiVerifyView view ma get request pathako 
+                        params: {
+                            "token": payload.token,             // payload ma token huncha
+                            "amount": payload.amount,           // payload ma amount huncha
+                            "order_id": "{{order.id}}"
+                        }
+                    }).then(function(resp){                     // yaha response return vai rako huncha
+                        if (resp.data.success == true)
+                        {
+                            alert("Thanks. Payment Completed Successfully")
+                            location.href = "/"
+                        }
+                        else
+                        {
+                            alert("Sorry. Error occurred")
+                            location.href = "{{request.build_absolute_uri}}"        // yo vaneko redirecting user to the current or same url
+                        }
+                    })
+                },
+                onError (error) {
+                    console.log(error);
+                },
+                onClose () {
+                    console.log('widget is closing');
+                }
+            }
+        };
+
+        var checkout = new KhaltiCheckout(config);
+        var btn = document.getElementById("payment-button");
+        btn.onclick = function () {
+            // minimum transaction amount must be 10 NRs, i.e 1000 in paisa.
+            
+            checkout.show({amount: {{order.total}}*100 });
+        }
+    </script>
+    <!-- Paste this code anywhere in you body tag -->
+</body>
+</html>
