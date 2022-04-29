@@ -126,7 +126,10 @@ You can setting up your project by  copy up and running follow these simple exam
 This is an example of how to list things you need to use the software and how to install them.
 * python
   ```sh
-  pip install django
+  pip install django==3.1
+  pip install requests
+  pip install django-rest-framework
+  pip install Pillow
   ```
 
 ### Installation
@@ -154,12 +157,21 @@ This is an example of how to list things you need to use the software and how to
   ```sh
   'app',
   'shop',
+  'rest-framework',
   ```
 * Include these paths in the root urls of your Project
   ```sh
    path("",include("app.urls")),
    path("shop",include("shop.urls")),
    ```
+* Don't forget to add media and static url in urlspatteerns of your root urls
+  ```sh
+    from django.conf import settings
+    from django.conf.urls.static import static
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    ```
+
 
 ### Configuration
 
@@ -169,6 +181,16 @@ This is an example of how to list things you need to use the software and how to
   LOGOUT_URL = 'logout'
   LOGIN_REDIRECT_URL = '/'
   LOGOUT_REDIRECT_URL = 'login'
+  ```
+* Add these configuration in the settings.py file
+  ```sh
+
+  AUTH_USER_MODEL = 'app.User'
+  VERIFY_EXPIRE_DAYS = 3
+
+  MEDIA_URL = '/media/'
+  MEDIA_ROOT = BASE_DIR/ 'media'
+
 
   ```
 
@@ -196,6 +218,7 @@ This is an example of how to list things you need to use the software and how to
 ## Features
 
 * Inbuilt product model for adding product
+* Cart is already implemented for adding product to cart
 * Esewa and Khalti are already implemented for Payment Purpose
 * Inbuilt subscription model for adding and manage subscription like  weekly, monthly, yearly etc
 
