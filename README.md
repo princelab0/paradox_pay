@@ -200,13 +200,17 @@ This is an example of how to list things you need to use the software and how to
 
 * After listing all the configuration command following commands 
   ```sh
-  python manage.py makemigrations app
+  python manage.py makemigrations 
   python manage.py migrate
-  python manage.py makemigrations shop
-  python manage.py migrate
+  python manage.py createsuperuser
   ```
 
 * After that please create  Product and Subscription from Admin panel
+* Please create a free subscription plan before register or login to the app otherwise you will get error
+* Esewa merchant key and Khalti public key and private key should be added in the admin panel 
+* If you already added the merchant key and public key then you can update the key in the admin panel but don't delete the key and don't add two key  from the admin panel  otherwise you will get error 
+* This system will work until you will update the esewa and khalti key incase of any changes in the key  but don't add new key from the admin panel otherwise you will get error
+
 
 
 
