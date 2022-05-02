@@ -20,6 +20,10 @@ class Product(models.Model):
 
 class eSewa(models.Model):
 	 merchant_id = models.CharField(max_length=100,default='epay_payment')
+
+class Khalti(models.Model):
+    public_key = models.CharField(max_length=150,blank=True,null=True)
+    private_key = models.CharField(max_length=150,blank=True,null=True)
     
  
 

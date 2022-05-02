@@ -32,8 +32,10 @@ class EsewaProductRequestView(View):
         o_id = request.GET.get("o_id")
         order = Order.objects.get(id= o_id)
         print(order)
+        esewa = eSewa.objects.get(id=1)
         context ={
-            "order":order
+            "order":order,
+            'esewa':esewa
         }
         return render(request,"shop/esewarequest.html",context)
 
@@ -51,7 +53,7 @@ class EsewaProductVerifyView(View):
 
         d = {                                               
             'amt': amt,
-            'scd': 'epay_payment',
+            'scd': eSewa.objects.get(id=1).merchant_id,
             'rid': refId,
             'pid': oid,
         }
@@ -208,8 +210,11 @@ class KhaltiProductRequestView(View):
     def get(self, request, *args, **kwargs):
         o_id = request.GET.get("o_id")
         order = Order.objects.get(id=o_id)
+        khalti = Khalti.objects.get(id=1)
         context = {
-            "order": order
+            "order": order,
+            'khalti': khalti
+
         }
         return render(request, "shop/khaltirequest.html", context)
 
@@ -228,7 +233,7 @@ class KhaltiProductVerifyView(View):
         }
 
         headers = {                                
-            "Authorization": "Key test_secret_key_98500166be6743ddaa4414e64963359a"
+            "Authorization": Khalti.objects.get(id=1).private_key,
         }
 
         order_obj = Order.objects.get(id=o_id)
@@ -251,9 +256,3 @@ class KhaltiProductVerifyView(View):
         }
 
         return JsonResponse(data)          
-     
-
-
-
-
-    

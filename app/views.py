@@ -1,4 +1,3 @@
-from unittest import TextTestRunner
 from django.shortcuts import render, redirect
 from django.views import View
 from rest_framework.views import APIView
@@ -14,14 +13,16 @@ import requests
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from.models import User
- 
-
+from shop.models import Khalti, eSewa
 
 today = datetime.date.today()
 
  
 def home(request):
-	return render(request, 'index.html')
+	if request.user.is_authenticated:
+		return redirect('home/')
+	else:
+		return render(request, 'index.html')
 
 def index(request):
 	user_membership = UserMembership.objects.get(user=request.user)
@@ -33,10 +34,9 @@ def index(request):
 		return render(request, 'home.html', {'sub': subscription})
 	
 
-def signin(request):
-	
+def signin(request):	
 	if request.user.is_authenticated:
-		return redirect('home/')
+		return redirect('/')
 	else:
 		return render(request, 'login.html')
 
@@ -112,9 +112,11 @@ def subscribe(request):
 	amount = int(price)
 	
 	instance = PayHistory.objects.create(amount= amount, payment_for=membership, user=request.user)
+	esewa_id = eSewa.objects.get(id=1)
 	
 	context = {
 		'instance': instance,
+		'esewa_id':esewa_id
 	}
 	UserMembership.objects.filter(user=instance.user).update(membership=membership)
 	return render(request, 'esewarequest.html',context)
@@ -132,7 +134,7 @@ class EsewaVerifyView(View):
 
         d = {                                               
             'amt': amt,
-            'scd': 'epay_payment',
+            'scd': eSewa.objects.get(id=1).merchant_id,
             'rid': refId,
             'pid': oid,
         }
@@ -150,7 +152,7 @@ class EsewaVerifyView(View):
             order_obj.save()
             return redirect("/")
         else:                                               
-            return redirect("/esewa-request/?o_id="+order_id)
+            return redirect("/subscribe/?o_id="+order_id)
                 
 
 def subscribed(request):
@@ -166,8 +168,10 @@ def  khaltirequest(request):
 	price = float(membership.price)  
 	amount = int(price)
 	instance = PayHistory.objects.create(amount= amount, payment_for=membership, user=request.user)
+	khalti = Khalti.objects.get(id=1)
 	context = {
 		'instance': instance,
+		'khalti':khalti
 	}
 	UserMembership.objects.filter(user=instance.user).update(membership=membership)
 	return render(request,"khaltirequest.html", context)
@@ -188,7 +192,7 @@ class KhaltiVerifyView(View):
         }
 
         headers = {                                
-            "Authorization": "Key test_secret_key_98500166be6743ddaa4414e64963359a"
+            "Authorization":  Khalti.objects.get(id=1).private_key,
         }
 		
         order_obj = PayHistory.objects.get(id=o_id)

@@ -124,12 +124,9 @@ You can setting up your project by  copy up and running follow these simple exam
 ### Prerequisites
 
 This is an example of how to list things you need to use the software and how to install them.
-* python
+
   ```sh
-  pip install django==3.1
-  pip install requests
-  pip install django-rest-framework
-  pip install Pillow
+  python
   ```
 
 ### Installation
@@ -143,6 +140,13 @@ This is an example of how to list things you need to use the software and how to
    ```sh
    pip install paradox-pay
    ```
+3. Install these requirements
+    ```sh
+    pip install django==3.1
+    pip install requests
+    pip install django-rest-framework
+    pip install Pillow
+    ```
  
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -179,7 +183,7 @@ This is an example of how to list things you need to use the software and how to
   ```sh
   LOGIN_URL = 'login'
   LOGOUT_URL = 'logout'
-  LOGIN_REDIRECT_URL = '/'
+  LOGIN_REDIRECT_URL = 'home/'
   LOGOUT_REDIRECT_URL = 'login'
   ```
 * Add these configuration in the settings.py file

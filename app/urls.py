@@ -1,11 +1,10 @@
-from django.conf.urls import url
 from django.urls import path
 from . import views
 from .views import Register, Login,EsewaVerifyView,KhaltiVerifyView
 
 urlpatterns = [
-	path('register/', views.home, name='index'),
-	path('', views.signin, name='login'),
+	path('', views.home, name='index'),
+	path('login/', views.signin, name='login'),
 	path('home/', views.index, name='home'),
     path('logout/', views.logout, name='logout'),
     path('check-mail-ajax/', views.check_mail_ajax, name='check_mail_ajax'),
