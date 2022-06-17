@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # 'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,7 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework', # Rest Framework
     'app', # Application
-    'shop', # Shop
+    'shop',
+   
+    
+     
+     
+     
      
 ]
 
@@ -136,5 +142,7 @@ LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'home/'
 LOGOUT_REDIRECT_URL = 'login'
+
+
 
  

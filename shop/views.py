@@ -6,18 +6,39 @@ from .models import *
 from .forms import CheckoutForm
 from django.urls import reverse_lazy
 from django.http import JsonResponse
-from django.urls import reverse
-import requests
+from rest_framework.viewsets import ModelViewSet
+from .serializers import ProductSerializer, OrderSerializer, CartSerializer, cartProductSerializer
+
 
 # Create your views here.
 
 def product(request):
     return HttpResponse("hi there")
 
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+class OrderViewSet(ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+class CartViewSet(ModelViewSet):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+
+class CartProductViewSet(ModelViewSet):
+    queryset = CartProduct.objects.all()
+    serializer_class = cartProductSerializer
+
+
+
+
 
 class HomePage(ListView):
     template_name = "shop/home.html"
     model = Product
+
 
 
 class EsewaProductRequestView(View):
@@ -70,7 +91,7 @@ class EsewaProductVerifyView(View):
         if status == "Success":                             
             order_obj.payment_completed = True
             order_obj.save()
-            return redirect("/")
+            return redirect("shop/")
         else:                                               
             return redirect("/esewaproduct-request/?o_id="+order_id)
 
@@ -200,6 +221,7 @@ class CheckoutView(CreateView):
                 return redirect(reverse("esewarequest")+ "?o_id=" + str(order.id))
             elif pm == "Khalti":                              
                 return redirect(reverse("khaltiproductrequest") + "?o_id=" + str(order.id))
+             
         else:
             return redirect("home")
         return super().form_valid(form)
@@ -255,4 +277,6 @@ class KhaltiProductVerifyView(View):
             "success": success
         }
 
-        return JsonResponse(data)          
+        return JsonResponse(data)  
+
+ 

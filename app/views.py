@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import JsonResponse
 from .models import *
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, MembershipSerializer, PayHistorySerializer, UserMembershipSerializer
 from django.contrib.auth.hashers import make_password
 from django.contrib import auth
 import datetime
@@ -14,8 +14,36 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from.models import User
 from shop.models import Khalti, eSewa
+from rest_framework.viewsets import ModelViewSet
 
 today = datetime.date.today()
+
+
+
+class RegisterViewSet(ModelViewSet):
+	queryset = User.objects.all()
+	serializer_class = RegisterSerializer
+
+class LoginViewSet(ModelViewSet):
+	queryset = User.objects.all()
+	serializer_class = LoginSerializer
+
+class UserViewSet(ModelViewSet):
+	queryset = User.objects.all()
+	serializer_class = UserSerializer
+
+class PayHistoryViewSet(ModelViewSet):
+	queryset = PayHistory.objects.all()
+	serializer_class = PayHistorySerializer
+
+class UserMembershipViewSet(ModelViewSet):
+	queryset = UserMembership.objects.all()
+	serializer_class = UserMembershipSerializer
+
+class MembershipViewSet(ModelViewSet):
+	queryset = Membership.objects.all()
+	serializer_class = MembershipSerializer
+
 
  
 def home(request):

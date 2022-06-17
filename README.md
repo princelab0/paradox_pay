@@ -30,8 +30,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/github_username/repo_name">
-    <img src="images/djesewa.png" alt="Logo" width="150" height="80">
+  <a href="https://github.com/PrinceSingh-123/paradox_pay/tree/version_1">
+    <img src="https://github.com/PrinceSingh-123/paradox_pay/blob/version_1/images/djesewa.png" alt="Logo" width="150" height="80">
   </a>
 
 <h3 align="center">Integrate Esewa and Khalti for payment</h3>
@@ -88,7 +88,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![Product Name Screen Shot][product-screenshot]](https://github.com/PrinceSingh-123/paradox_pay/tree/version_1)
 
  
 This Reusable App is used for the esewa payment purposes. With the help of this project you can have lots of features 
@@ -293,7 +293,8 @@ Project Link: [https://github.com/PrinceSingh-123/paradox_pay](https://github.co
 [license-url]: https://github.com/PrinceSingh-123/paradox_pay/blob/main/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/purusottam-adhikari/
-[product-screenshot]: images/admin.jpg
+[product-screenshot]: https://github.com/PrinceSingh-123/paradox_pay/blob/version_1/images/admin.jpg
 
 
 
+"# subscription_package" 

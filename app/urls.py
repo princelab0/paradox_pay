@@ -1,6 +1,15 @@
-from django.urls import path
+from django.urls import path,include
 from . import views
-from .views import Register, Login,EsewaVerifyView,KhaltiVerifyView
+from .views import Register, Login,EsewaVerifyView,KhaltiVerifyView,RegisterViewSet,LoginViewSet,UserViewSet,PayHistoryViewSet,UserMembershipViewSet,MembershipViewSet
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register(r'register', RegisterViewSet)
+router.register(r'login', LoginViewSet)
+router.register(r'users', UserViewSet)
+router.register(r'payhistory', PayHistoryViewSet)
+router.register(r'usermembership', UserMembershipViewSet)
+router.register(r'membership', MembershipViewSet)
 
 urlpatterns = [
 	path('', views.home, name='index'),
@@ -19,5 +28,6 @@ urlpatterns = [
     path("khalti-request/", views.khaltirequest, name="khaltirequest"),
     #this is the url for verifying whether khalti payment is success or not
     path("khalti-verify/", KhaltiVerifyView.as_view(), name="khaltiverify"),
+    path('api/', include(router.urls)),
 
 ]

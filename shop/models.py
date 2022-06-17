@@ -75,5 +75,8 @@ class Order(models.Model):
     payment_completed = models.BooleanField(default=False,null=True,blank=True)
 
     def __str__(self):
-        return "Order:" + str(self.id)
+        return "Order Id:" + str(self.id)+" " +"Order by "+str(self.ordered_by)
+
+
+
  
