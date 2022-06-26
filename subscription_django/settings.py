@@ -31,8 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    # 'jazzmin',
-    'django.contrib.admin',
+    'jazzmin',
+    'subscription_django.apps.CustomAdminConfig',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework', # Rest Framework
     'app', # Application
     'shop',
+    'dashboard'
    
     
      

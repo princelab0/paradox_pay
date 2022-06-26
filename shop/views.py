@@ -1,4 +1,5 @@
-from django.http import HttpResponse
+from typing import OrderedDict
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.generic import View, TemplateView, CreateView, FormView, DetailView, ListView   
 from django.shortcuts import get_object_or_404, render,redirect
@@ -8,12 +9,11 @@ from django.urls import reverse_lazy
 from django.http import JsonResponse
 from rest_framework.viewsets import ModelViewSet
 from .serializers import ProductSerializer, OrderSerializer, CartSerializer, cartProductSerializer
+from django.core import serializers
 
 
 # Create your views here.
 
-def product(request):
-    return HttpResponse("hi there")
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
@@ -98,6 +98,9 @@ class EsewaProductVerifyView(View):
 
 def detail(request):
     return render(request,'detail.html')
+
+class Detail(TemplateView):
+    template_name = 'detail.html'
 
 class AddToCartView(TemplateView):
     template_name="shop/addtocart.html"
@@ -279,4 +282,122 @@ class KhaltiProductVerifyView(View):
 
         return JsonResponse(data)  
 
- 
+
+
+  
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Count,F,Sum,Avg
+from django.db.models.functions import ExtractYear,ExtractMonth
+from utils.charts import months, colorPrimary,colorSuccess,colorDanger,colorPalette,generate_color_palette,get_year_dict
+
+@staff_member_required
+def get_filter_options(request):
+    grouped_orders = Order.objects.annotate(year=ExtractYear('created_at')).values('year').order_by('-year').distinct()
+    options = [order['year'] for order in grouped_orders]
+    return JsonResponse({
+        'options':options,
+    })
+
+@staff_member_required
+def get_sales_chart(request, year):
+    purchases = Order.objects.filter(created_at__year=year)
+    grouped_purchases = purchases.annotate(price=F('total')).annotate(month=ExtractMonth('created_at'))\
+        .values('month').annotate(average=Sum('total')).values('month', 'average').order_by('month')
+
+    sales_dict = get_year_dict()
+
+    for group in grouped_purchases:
+        sales_dict[months[group['month']-1]] = round(group['average'], 2)
+
+    return JsonResponse({
+        'title': f'Sales in {year}',
+        'data': {
+            'labels': list(sales_dict.keys()),
+            'datasets': [{
+                'label': 'Amount ($)',
+                'backgroundColor': colorPrimary,
+                'borderColor': colorPrimary,
+                'data': list(sales_dict.values()),
+            }]
+        },
+    })
+
+
+@staff_member_required
+def spend_per_customer_chart(request, year):
+    purchases = Order.objects.filter(created_at__year=year)
+    grouped_purchases = purchases.annotate(price=F('total')).annotate(month=ExtractMonth('created_at'))\
+        .values('month').annotate(average=Avg('total')).values('month', 'average').order_by('month')
+
+    spend_per_customer_dict = get_year_dict()
+
+    for group in grouped_purchases:
+        spend_per_customer_dict[months[group['month']-1]] = round(group['average'], 2)
+
+    return JsonResponse({
+        'title': f'Spend per customer in {year}',
+        'data': {
+            'labels': list(spend_per_customer_dict.keys()),
+            'datasets': [{
+                'label': 'Amount ($)',
+                'backgroundColor': colorPrimary,
+                'borderColor': colorPrimary,
+                'data': list(spend_per_customer_dict.values()),
+            }]
+        },
+    })
+
+
+@staff_member_required
+def payment_success_chart(request, year):
+    purchases = Order.objects.filter(created_at__year=year)
+
+    return JsonResponse({
+        'title': f'Payment success rate in {year}',
+        'data': {
+            'labels': ['payment_completed', 'payment_uncompleted'],
+            'datasets': [{
+                'label': 'Amount ($)',
+                'backgroundColor': [colorSuccess, colorDanger],
+                'borderColor': [colorSuccess, colorDanger],
+                'data': [
+                    purchases.filter(payment_completed=True).count(),
+                    purchases.filter(payment_completed=False).count(),
+                ],
+            }]
+        },
+    })
+
+
+@staff_member_required
+def payment_method_chart(request, year):
+    orders = Order.objects.filter(created_at__year=year)
+    grouped_purchases = orders.values('payment_method').annotate(count=Count('id'))\
+        .values('payment_method', 'count').order_by('payment_method')
+
+    payment_method_dict = dict()
+
+    for payment_method in Order.PAYMENT_METHODS:
+        payment_method_dict[payment_method[1]] = 0
+
+    for group in grouped_purchases:
+        payment_method_dict[dict(OrderedDict.PAYMENT_METHODS)[group['payment_method']]] = group['count']
+
+    return JsonResponse({
+        'title': f'Payment method rate in {year}',
+        'data': {
+            'labels': list(payment_method_dict.keys()),
+            'datasets': [{
+                'label': 'Amount ($)',
+                'backgroundColor': generate_color_palette(len(payment_method_dict)),
+                'borderColor': generate_color_palette(len(payment_method_dict)),
+                'data': list(payment_method_dict.values()),
+            }]
+        },
+    })
+
+
+@staff_member_required
+def statistics_view(request):
+    return render(request, 'statistic.html', {})

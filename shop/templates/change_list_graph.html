@@ -1,0 +1,81 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+{% block extrahead %}
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.min.js"></script>
+    <script>
+        var randomColorGenerator = function () {
+            return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
+        };
+        var options = {
+            responsive: true,
+            maintainAspectRatio: true,
+            legend: {
+                position: 'left'
+            },
+            title: {
+                display: true
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            }
+        };
+        window.onload = function () {
+            var ctx = document.getElementById("cart-chart");
+            {% regroup cl.queryset|dictsort:"cart" by get_cart_display as cart_list %}
+            var lineChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [{% for cart in cart_list %}'{{ cart.grouper }}',{% endfor %}],
+                    datasets: [{
+                        data: [{% for cart in cart_list %}'{{ cart.list|length }}',{% endfor %}],
+                        backgroundColor: [{% for cart in cart_list %}randomColorGenerator(),{% endfor %}]
+                    }]
+                },
+                options: options
+            });
+            ctx = document.getElementById("ordered_by-chart");
+            {% regroup cl.queryset|dictsort:"total" by grades as total_list %}
+            lineChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [{% for total in total_list %}'{{ total.grouper }}',{% endfor %}],
+                    datasets: [{
+                        data: [{% for total in total_list %}'{{ total.list|length }}',{% endfor %}],
+                        backgroundColor: [{% for total in total_list %}randomColorGenerator(),{% endfor %}]
+                    }]
+                }, options: options
+            });
+            ctx = document.getElementById("total-chart");
+            {% regroup cl.queryset|dictsort:"payment_method" by get_language_display as payment_method_list %}
+            lineChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [{% for payment_method in payment_method_list %}'{{ payment_method.grouper }}',{% endfor %}],
+                    datasets: [{
+                        data: [{% for payment_method in payment_method_list %}'{{ payment_method.list|length }}',{% endfor %}],
+                        backgroundColor: [{% for payment_method` in payment_method_list %}randomColorGenerator(),{% endfor %}]
+                    }]
+                }, options: options
+            });
+        }
+    </script>
+{% endblock %}
+{% block content %}
+    <h1> Graphs </h1>
+    <hr>
+    <div class="row">
+        <div class="col-sm-4">
+            <canvas id="cart-chart" style="width: 100px !important;"></canvas>
+        </div>
+        <div class="col-sm-4">
+            <canvas id="ordered_by-chart" style="width: 100px !important;"></canvas>
+        </div>
+        <div class="col-sm-4">
+            <canvas id="payment_method-chart" style="width: 100px !important;"></canvas>
+        </div>
+    </div>
+    {{ block.super }}
+{% endblock %}

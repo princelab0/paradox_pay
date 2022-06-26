@@ -1,7 +1,7 @@
 
 from django.urls.conf import include
 from django.urls import path
-from .views import *
+from shop.views import CartProduct, KhaltiProductRequestView, KhaltiProductVerifyView,ProductViewSet,OrderViewSet,CartViewSet,HomePage,EsewaProductRequestView,EsewaProductVerifyView,KhaltiProductRequestView,KhaltiProductVerifyView, AddToCartView,MyCartView,ManageCartView,EmptyCartView,CheckoutView,get_filter_options,generate_color_palette,get_sales_chart,spend_per_customer_chart,payment_method_chart,payment_success_chart,statistics_view
 from django.contrib.auth.decorators import login_required
 from rest_framework import routers
 
@@ -25,4 +25,11 @@ urlpatterns = [
     path("manage-cart/<int:cp_id>/", login_required(ManageCartView.as_view()), name="managecart"),
     path("empty-cart/", login_required(EmptyCartView.as_view()), name="emptycart"),
     path("checkout/", login_required(CheckoutView.as_view()), name="checkout"),
+    path('chart/filter-options/', get_filter_options, name='chart-filter-options'),
+    path('chart/sales/<int:year>/', get_sales_chart, name='chart-sales'),
+    path('chart/spend-per-customer/<int:year>/', spend_per_customer_chart, name='chart-spend-per-customer'),
+    path('chart/payment-success/<int:year>/', payment_success_chart, name='chart-payment-success'),
+    path('chart/payment-method/<int:year>/', payment_method_chart, name='chart-payment-method'),
+     path('statistics/', statistics_view, name='shop-statistics'), 
 ]
+

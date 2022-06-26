@@ -1,3 +1,4 @@
+from msilib.schema import ListView
 from django.shortcuts import render, redirect
 from django.views import View
 from rest_framework.views import APIView
@@ -15,6 +16,7 @@ from django.contrib.auth.decorators import login_required
 from.models import User
 from shop.models import Khalti, eSewa
 from rest_framework.viewsets import ModelViewSet
+from django.views.generic import View, TemplateView
 
 today = datetime.date.today()
 
@@ -46,11 +48,21 @@ class MembershipViewSet(ModelViewSet):
 
 
  
-def home(request):
-	if request.user.is_authenticated:
-		return redirect('home/')
-	else:
-		return render(request, 'index.html')
+# def home(request):
+# 	if request.user.is_authenticated:
+# 		return redirect('home/')
+# 	else:
+# 		return render(request, 'index.html')
+
+class Home(TemplateView):
+	template_name = 'index.html'
+	def dispatch(self,request,*args,**kwargs):
+		if request.user.is_authenticated:
+			return redirect('home/')
+		# else:
+		# 	return render (request,'index.html')
+		return super().dispatch(request, *args, **kwargs)
+ 
 
 def index(request):
 	user_membership = UserMembership.objects.get(user=request.user)
@@ -62,25 +74,48 @@ def index(request):
 		return render(request, 'home.html', {'sub': subscription})
 	
 
-def signin(request):	
-	if request.user.is_authenticated:
-		return redirect('/')
-	else:
-		return render(request, 'login.html')
+# def signin(request):	
+# 	if request.user.is_authenticated:
+# 		return redirect('/')
+# 	else:
+# 		return render(request, 'login.html')
 
-def check_mail_ajax(request):
-	if request.is_ajax():
-		email = request.GET.get('email', None)
-		check_email = User.objects.filter(email=email).exists()
-		if check_email == True:
-			response = {'error': 'Email already exists.'}
-			return JsonResponse(response)
+class signin(TemplateView):
+	template_name = 'login.html'
+	def dispatch(self,request,*args,**kwargs):
+		if request.user.is_authenticated:
+			return redirect('/')
+		return super().dispatch(request, *args, **kwargs)
+
+
+# def check_mail_ajax(request):
+# 	if request.is_ajax():
+# 		email = request.GET.get('email', None)
+# 		check_email = User.objects.filter(email=email).exists()
+# 		if check_email == True:
+# 			response = {'error': 'Email already exists.'}
+# 			return JsonResponse(response)
+# 		else:
+# 			response = {'success': 'Cool'}
+# 			return JsonResponse(response)
+# 	else:
+# 		response = {'error': 'Error Email Checking.'}
+# 		return JsonResponse(response)
+
+class check_mail_ajax(View):
+	def get(self,request,*args,**kwargs):
+		if request.is_ajax():
+			email = request.GET.get('email', None)
+			check_email = User.objects.filter(email=email).exists()
+			if check_email == True:
+				response = {'error': 'Email already exists.'}
+				return JsonResponse(response)
+			else:
+				response = {'success': 'Cool'}
+				return JsonResponse(response)
 		else:
-			response = {'success': 'Cool'}
+			response = {'error': 'Error Email Checking.'}
 			return JsonResponse(response)
-	else:
-		response = {'error': 'Error Email Checking.'}
-		return JsonResponse(response)
 
 
 class Register(APIView):
@@ -121,33 +156,61 @@ class Login(APIView):
 			return Response({'error': 'Invalid email/password. Try again later.'})
 
 
-def subscription(request):
-	return render(request, 'subscription.html')
+# def subscription(request):
+# 	return render(request, 'subscription.html')
 
-def end_sub(request):
-	return render(request, 'sub.html')
+class subscription(TemplateView):
+	template_name= 'subscription.html'
+
+# def end_sub(request):
+# 	return render(request, 'sub.html')
+
+class end_sub(TemplateView):
+	template_name='sub.html'
 
 
  
 
-def subscribe(request):
-	plan = request.GET.get('sub_plan')
-	fetch_membership = Membership.objects.filter(membership_type=plan).exists()
-	if fetch_membership == False:
-		return redirect('subscribe')
-	membership = Membership.objects.get(membership_type=plan)
-	price = float(membership.price)  
-	amount = int(price)
+# def subscribe(request):
+# 	plan = request.GET.get('sub_plan')
+# 	fetch_membership = Membership.objects.filter(membership_type=plan).exists()
+# 	if fetch_membership == False:
+# 		return redirect('subscribe')
+# 	membership = Membership.objects.get(membership_type=plan)
+# 	price = float(membership.price)  
+# 	amount = int(price)
 	
-	instance = PayHistory.objects.create(amount= amount, payment_for=membership, user=request.user)
-	esewa_id = eSewa.objects.get(id=1)
+# 	instance = PayHistory.objects.create(amount= amount, payment_for=membership, user=request.user)
+# 	esewa_id = eSewa.objects.get(id=1)
 	
-	context = {
-		'instance': instance,
-		'esewa_id':esewa_id
-	}
-	UserMembership.objects.filter(user=instance.user).update(membership=membership)
-	return render(request, 'esewarequest.html',context)
+# 	context = {
+# 		'instance': instance,
+# 		'esewa_id':esewa_id
+# 	}
+# 	UserMembership.objects.filter(user=instance.user).update(membership=membership)
+# 	return render(request, 'esewarequest.html',context)
+
+
+class subscribe(View):
+	def get(self,request,*args,**kwargs):
+		plan = request.GET.get('sub_plan')
+		fetch_membership = Membership.objects.filter(membership_type=plan).exists()
+		if fetch_membership == False:
+			return redirect('subscribe')
+		membership = Membership.objects.get(membership_type=plan)
+		price = float(membership.price)  
+		amount = int(price)
+
+		instance = PayHistory.objects.create(amount= amount, payment_for=membership, user=request.user)
+		esewa_id = eSewa.objects.get(id=1)
+
+		context = {
+			'instance': instance,
+			'esewa_id':esewa_id
+		}
+		UserMembership.objects.filter(user=instance.user).update(membership=membership)
+		return render(request, 'esewarequest.html',context)
+
 
 class EsewaVerifyView(View):
     def get(self, request, *args, **kwargs):
@@ -183,26 +246,48 @@ class EsewaVerifyView(View):
             return redirect("/subscribe/?o_id="+order_id)
                 
 
-def subscribed(request):
-	return render(request, 'subscribed.html')
+# def subscribed(request):
+# 	return render(request, 'subscribed.html')
+
+class subscribed(TemplateView):
+	template_name = 'subscribed.html'
 
 
-def  khaltirequest(request):   
-	plan = request.GET.get('sub_plan')
-	fetch_membership = Membership.objects.filter(membership_type=plan).exists()
-	if fetch_membership == False:
-		return redirect('subscribe')
-	membership = Membership.objects.get(membership_type=plan)
-	price = float(membership.price)  
-	amount = int(price)
-	instance = PayHistory.objects.create(amount= amount, payment_for=membership, user=request.user)
-	khalti = Khalti.objects.get(id=1)
-	context = {
+# def  khaltirequest(request):   
+# 	plan = request.GET.get('sub_plan')
+# 	fetch_membership = Membership.objects.filter(membership_type=plan).exists()
+# 	if fetch_membership == False:
+# 		return redirect('subscribe')
+# 	membership = Membership.objects.get(membership_type=plan)
+# 	price = float(membership.price)  
+# 	amount = int(price)
+# 	instance = PayHistory.objects.create(amount= amount, payment_for=membership, user=request.user)
+# 	khalti = Khalti.objects.get(id=1)
+# 	context = {
+# 		'instance': instance,
+# 		'khalti':khalti
+# 	}
+# 	UserMembership.objects.filter(user=instance.user).update(membership=membership)
+# 	return render(request,"khaltirequest.html", context)
+
+class khaltirequest(View):
+	def get(self,request,*args,**kwargs):
+		plan = request.GET.get('sub_plan')
+		fetch_membership = Membership.objects.filter(membership_type=plan).exists()
+		if fetch_membership == False:
+			return redirect('subscribe')
+		membership = Membership.objects.get(membership_type=plan)
+		price = float(membership.price)  
+		amount = int(price)
+		instance = PayHistory.objects.create(amount= amount, payment_for=membership, user=request.user)
+		khalti = Khalti.objects.get(id=1)
+		context = {
 		'instance': instance,
 		'khalti':khalti
-	}
-	UserMembership.objects.filter(user=instance.user).update(membership=membership)
-	return render(request,"khaltirequest.html", context)
+		}
+		UserMembership.objects.filter(user=instance.user).update(membership=membership)
+		return render(request,"khaltirequest.html", context)
+
 
 
 class KhaltiVerifyView(View):
@@ -246,3 +331,5 @@ class KhaltiVerifyView(View):
 def logout(request):
 	auth.logout(request)
 	return redirect('/')
+
+ 
