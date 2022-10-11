@@ -1,0 +1,15 @@
+<div class="container mt-5 text-center">
+  <h2>Pay with Stripe</h2>
+  {% comment %} <form action="{% url 'charge' %}" method="post"> {% endcomment %}
+  <form action="{% url 'chargeuser' instance.id %}" method="post">
+    {% csrf_token %}
+    <script
+      src="https://checkout.stripe.com/checkout.js"
+      class="stripe-button"
+      data-key="{{ key }}"
+      data-description="Complete your order"
+      data-amount="{{ total }}"
+      data-locale="auto"
+    ></script>
+  </form>
+</div>

@@ -1,4 +1,3 @@
-from msilib.schema import ListView
 from django.shortcuts import render, redirect
 from django.views import View
 from rest_framework.views import APIView
@@ -11,14 +10,17 @@ from django.contrib.auth.hashers import make_password
 from django.contrib import auth
 import datetime
 import requests
+import stripe
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from.models import User
 from shop.models import Khalti, eSewa
 from rest_framework.viewsets import ModelViewSet
 from django.views.generic import View, TemplateView
-
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.views import APIView
 today = datetime.date.today()
+
 
 
 
@@ -66,6 +68,7 @@ class Home(TemplateView):
 
 def index(request):
 	user_membership = UserMembership.objects.get(user=request.user)
+	print(user_membership)
 	subscriptions = Subscription.objects.filter(user_membership=user_membership).exists()
 	if subscriptions == False:
 		return redirect('sub')
@@ -327,6 +330,65 @@ class KhaltiVerifyView(View):
         }
 
         return JsonResponse(data)   
+
+class Subpayment(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'users/payment.html'
+
+    def get(self, request, *args, **kwargs):
+        key = "your publishable key"
+        plan = request.GET.get("sub_plan")
+        fetch_membership = Membership.objects.filter(membership_type=plan).exists()
+        if fetch_membership == False:
+            return redirect('subscribe')
+        membership = Membership.objects.get(membership_type=plan)
+        price = membership.price 
+        amount = price
+        instance = PayHistory.objects.create(amount= amount, payment_for=membership, user=request.user)
+        price = amount*100;
+        total = round(amount,2)
+        if request.method == 'POST':
+            charge = stripe.Charge.create(amount=total,
+                currency='usd',
+                description=name,
+                source=request.POST['stripeToken'])
+        UserMembership.objects.filter(user=instance.user).update(membership=membership)
+        return Response( {"key": key, "total": total,"instance":instance})
+         
+
+def charge(request,o_id):
+	# order = Order.objects.get(user=request.user, ordered=False)
+    # print(abc)
+    order_obj = PayHistory.objects.get(id=o_id) 
+
+    order_total = order_obj.amount               
+    totalCents = int(order_total * 100)
+    print(totalCents)
+    stripe.api_key= "your secret key"
+    if request.method == 'POST':
+        charge = stripe.Charge.create(amount=totalCents,
+            currency='usd',
+            description= order_obj,
+            source=request.POST['stripeToken'])
+        print('abc')
+            
+        if charge.status == "succeeded":
+            # orderId = get_random_string(length=16, allowed_chars=u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+            print(charge.id)
+            order_obj.paid = True    
+            order_obj.save() 
+            # order.paymentId = charge.id
+            # order.orderId = f'#{request.user}{orderId}'
+            # order.save()
+            # cartItems = Cart.objects.filter(user=request.user)
+            # for item in cartItems:
+            #     item.purchased = True
+            #     item.save()
+            return render(request, 'users/charge.html')
+
+
+
+ 
 
 def logout(request):
 	auth.logout(request)

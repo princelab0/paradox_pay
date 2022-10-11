@@ -1,7 +1,7 @@
 
 from django.urls.conf import include
 from django.urls import path
-from shop.views import CartProduct, KhaltiProductRequestView, KhaltiProductVerifyView,ProductViewSet,OrderViewSet,CartViewSet,HomePage,EsewaProductRequestView,EsewaProductVerifyView,KhaltiProductRequestView,KhaltiProductVerifyView, AddToCartView,MyCartView,ManageCartView,EmptyCartView,CheckoutView,get_filter_options,generate_color_palette,get_sales_chart,spend_per_customer_chart,payment_method_chart,payment_success_chart,statistics_view
+from shop.views import CartProduct, KhaltiProductRequestView, KhaltiProductVerifyView,ProductViewSet,OrderViewSet,CartViewSet,HomePage,EsewaProductRequestView,EsewaProductVerifyView,KhaltiProductRequestView,KhaltiProductVerifyView, AddToCartView,MyCartView,ManageCartView,EmptyCartView,CheckoutView,get_filter_options,generate_color_palette,get_sales_chart,spend_per_customer_chart,payment_method_chart,payment_success_chart,statistics_view,payment,charge
 from django.contrib.auth.decorators import login_required
 from rest_framework import routers
 
@@ -30,6 +30,9 @@ urlpatterns = [
     path('chart/spend-per-customer/<int:year>/', spend_per_customer_chart, name='chart-spend-per-customer'),
     path('chart/payment-success/<int:year>/', payment_success_chart, name='chart-payment-success'),
     path('chart/payment-method/<int:year>/', payment_method_chart, name='chart-payment-method'),
-     path('statistics/', statistics_view, name='shop-statistics'), 
+    path('statistics/', statistics_view, name='shop-statistics'), 
+    # this is for stripe payment
+    path('payment/', payment.as_view(), name="payment"),
+    path('charge/<int:o_id>/',charge,name='charge'),
 ]
 

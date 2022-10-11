@@ -62,6 +62,7 @@ METHOD = (
 ("Cash On Delivery","Cash On Delivery"),
 ("Esewa","Esewa"),
 ("Khalti", "Khalti"),
+("Stripe","Stripe")
 )
 
 class Order(models.Model):

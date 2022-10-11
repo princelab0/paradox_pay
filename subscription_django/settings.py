@@ -42,8 +42,7 @@ INSTALLED_APPS = [
     'rest_framework', # Rest Framework
     'app', # Application
     'shop',
-    'dashboard'
-   
+     
     
      
      

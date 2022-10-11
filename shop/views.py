@@ -10,8 +10,11 @@ from django.http import JsonResponse
 from rest_framework.viewsets import ModelViewSet
 from .serializers import ProductSerializer, OrderSerializer, CartSerializer, cartProductSerializer
 from django.core import serializers
-
-
+from django.urls import reverse
+from rest_framework.views import APIView
+import stripe
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.response import Response
 # Create your views here.
 
 
@@ -224,6 +227,8 @@ class CheckoutView(CreateView):
                 return redirect(reverse("esewarequest")+ "?o_id=" + str(order.id))
             elif pm == "Khalti":                              
                 return redirect(reverse("khaltiproductrequest") + "?o_id=" + str(order.id))
+            elif pm == "Stripe":
+                return redirect(reverse("payment")+ "?o_id=" + str(order.id))
              
         else:
             return redirect("home")
@@ -281,6 +286,56 @@ class KhaltiProductVerifyView(View):
         }
 
         return JsonResponse(data)  
+
+
+class payment(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'checkout/payment.html'
+
+    def get(self, request, *args, **kwargs):
+        key = "your publishable key" #put your stripe publishable key
+        o_id = request.GET.get("o_id")
+        order = Order.objects.get(id=o_id)
+        # name = order.ordered_by
+        # print(name)
+        order_total = order.total
+        totalCents = float(order_total * 100);
+        total = round(totalCents, 2)
+        if request.method == 'POST':
+            charge = stripe.Charge.create(amount=total,
+                currency='usd',
+                description= name,
+                source=request.POST['stripeToken'])
+
+        return Response( {"key": key, "total": total,"order":order})
+
+def charge(request,o_id):
+	# order = Order.objects.get(user=request.user, ordered=False)
+    order = Order.objects.get(id=o_id)
+    order_total = order.total
+    totalCents = order_total * 100
+    print(totalCents)
+    stripe.api_key= "your secret key" #put your stripe secret key here
+    if request.method == 'POST':
+        charge = stripe.Charge.create(amount=totalCents,
+            currency='usd',
+            description=order,
+            source=request.POST['stripeToken'])
+        print('abc')
+            
+        if charge.status == "succeeded":
+            # orderId = get_random_string(length=16, allowed_chars=u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+            print(charge.id)
+            order.payment_completed = True
+            # order.paymentId = charge.id
+            # order.orderId = f'#{request.user}{orderId}'
+            order.save()
+            # cartItems = Cart.objects.filter(user=request.user)
+            # for item in cartItems:
+            #     item.purchased = True
+            #     item.save()
+            return render(request, 'checkout/charge.html')
+
 
 
 

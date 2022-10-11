@@ -1,6 +1,6 @@
 from django.urls import path,include
 # from .views import views
-from app.views import Register,khaltirequest,logout,subscribe,Home,end_sub,subscribed,subscription,signin,index,check_mail_ajax, Login,EsewaVerifyView,KhaltiVerifyView,RegisterViewSet,LoginViewSet,UserViewSet,PayHistoryViewSet,UserMembershipViewSet,MembershipViewSet
+from app.views import Register,khaltirequest,logout,subscribe,Home,end_sub,subscribed,subscription,signin,index,check_mail_ajax, Login,EsewaVerifyView,KhaltiVerifyView,RegisterViewSet,LoginViewSet,UserViewSet,PayHistoryViewSet,UserMembershipViewSet,MembershipViewSet,Subpayment,charge
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -28,5 +28,8 @@ urlpatterns = [
     #this is the url for verifying whether khalti payment is success or not
     path("khalti-verify/", KhaltiVerifyView.as_view(), name="khaltiverify"),
     path('api/', include(router.urls)),
+    # for stripe payment
+    path('subpayment/',Subpayment.as_view(),name="shopstripe"),
+    path('chargeuser/<int:o_id>/',charge, name="chargeuser")
 
 ]
